@@ -1,0 +1,63 @@
+Our Ubuntu installation first needs system packages for Python development
+We are using python 3.6 for development. Please make sure python 3.6 has installed
+
+sudo apt-get install python3-pip python3-dev virtualenv
+
+
+
+Create a directory to store virtualenvs then put a new virtualenv in it.
+Make sure pip and setuptools are the latest versions.
+
+pip3 install --upgrade pip setuptools
+
+
+Specify the system python3 installation
+
+python3 -m venv <path>/<venv_name>
+
+
+eg: python3 -m venv ~/venvs/warranty_manager
+Activate the virtualenv.
+
+source ~/venvs/warranty_manager/bin/activate
+
+
+
+Clone the project
+
+git clone git@github.com:Sudhathankavel/miniwallet.git
+
+
+
+Install the required packages
+
+pip install -r requirements.txt
+
+
+
+Create local settings.py
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': '<database_name>',
+        'USER': '<user>',
+        'PASSWORD': '<password>',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+
+
+
+Edit settings.py values as per your local installation. All values are required except Email settings which you may choose to use the defaults.
+
+Migrate the database
+
+python manage.py migrate
+
+
+
+Create a superuser
+
+python manage.py createsuperuser
+
