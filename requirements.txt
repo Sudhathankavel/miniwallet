@@ -1,1 +1,13 @@
+Django==3.2.13
+django-braces==1.15.0
+django-oauth-toolkit==2.0.0
+django-rest-framework-social-oauth2==1.1.0
+djangorestframework==3.13.1
+pickleshare==0.7.5
+pkg_resources==0.0.0
+prompt-toolkit==3.0.29
 psycopg2-binary==2.9.3
+setuptools-rust==1.1.2
+six==1.16.0
+social-auth-app-django==5.0.0
+social-auth-core==4.2.0

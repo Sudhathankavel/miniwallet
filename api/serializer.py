@@ -1,9 +1,6 @@
 from rest_framework import serializers
 from api.models import Wallet, Customer, DISABLED, ENABLED, Transaction, SUCCESS, DEPOSIT, WITHDRAW
-from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import User
 from django.conf import settings
-
 from api.utils import update_wallet_balance
 
 
@@ -20,7 +17,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
-        fields = ('customer_xid',)
+        fields = ('email', 'customer_xid',)
 
 
 class WalletSerializer(serializers.ModelSerializer):
@@ -51,7 +48,6 @@ class WalletSerializer(serializers.ModelSerializer):
         return obj.get_status_display()
 
     def create(self, validated_data):
-        import ipdb;ipdb.set_trace()
         if Wallet.objects.filter(owned_by=self.user).first():
             wallet_obj = Wallet.objects.filter(owned_by=self.user).get()
             if validated_data.get('is_disabled'):
@@ -91,7 +87,6 @@ class TransactionSerializer(serializers.ModelSerializer):
         read_only_fields = ('transaction_by',)
 
     def create(self, validated_data):
-        import ipdb;ipdb.set_trace()
         if Wallet.objects.filter(owned_by=self.user).first():
             wallet_obj = Wallet.objects.filter(owned_by=self.user).get()
             if wallet_obj.status == ENABLED:

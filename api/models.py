@@ -1,8 +1,6 @@
 import uuid
 
-from django.conf import settings
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import User, UserManager
+from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import AbstractUser
@@ -67,9 +65,10 @@ class UserManager(BaseUserManager):
 
 
 class Customer(AbstractUser):
+    email = models.EmailField(_('email address'), unique=True)
     customer_xid = models.UUIDField(max_length=500, primary_key=True, default=uuid.uuid4)
     phone_no = models.CharField(max_length=10)
-    USERNAME_FIELD = 'customer_xid'
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     objects = UserManager()

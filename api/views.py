@@ -26,6 +26,8 @@ class WalletCreateAPIView(generics.ListCreateAPIView):
             customer_xid = serializer.validated_data['customer_xid']
             if Customer.objects.filter(customer_xid=customer_xid).first():
                 customer = Customer.objects.filter(customer_xid=customer_xid).get()
+                customer.username = serializer.validated_data['email']
+                customer.save()
                 Wallet.objects.create(owned_by=customer)
                 token = Token.objects.filter(user=customer).first()
 
