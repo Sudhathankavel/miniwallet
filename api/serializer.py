@@ -1,13 +1,7 @@
 from rest_framework import serializers
 from api.models import Wallet, Customer, DISABLED, ENABLED, Transaction, SUCCESS, DEPOSIT, WITHDRAW
 from django.conf import settings
-from api.utils import update_wallet_balance
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = settings.AUTH_USER_MODEL
-        fields = '__all__'
+from api.utils import update_wallet_balance, create_transaction
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -89,36 +83,21 @@ class TransactionSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         if Wallet.objects.filter(owned_by=self.user).first():
             wallet_obj = Wallet.objects.filter(owned_by=self.user).get()
-            if wallet_obj.status == ENABLED:
+            if wallet_obj.status != ENABLED:
+                raise serializers.ValidationError \
+                    ({"detail": "Wallet is disabled"})
+            else:
                 if self.transaction == 'deposit':
-                    wallet_deposit_obj = Transaction.objects.create(transaction_by=self.user,
-                                                                    status=SUCCESS,
-                                                                    amount=validated_data.get('amount'),
-                                                                    reference_id=validated_data.
-                                                                    get('reference_id'),
-                                                                    transaction_type=DEPOSIT)
-                    wallet_deposit_obj.save()
-                    if validated_data.get('amount'):
-                        current_balance = update_wallet_balance(validated_data.get('amount'), DEPOSIT,
-                                                               wallet_obj.balance)
-                        wallet_obj.balance = current_balance
-                        wallet_obj.save()
+                    wallet_deposit_obj = create_transaction(self.user, SUCCESS,
+                                                            validated_data.get('amount'),
+                                                            validated_data.get('reference_id'),
+                                                            DEPOSIT, wallet_obj)
                     return wallet_deposit_obj
                 elif self.transaction == 'withdraw':
                     if validated_data.get('amount') <= wallet_obj.balance:
-                        wallet_deposit_obj = Transaction.objects.create(transaction_by=self.user,
-                                                                        status=SUCCESS,
-                                                                        amount=validated_data.get(
-                                                                            'amount'),
-                                                                        reference_id=validated_data.
-                                                                        get('reference_id'),
-                                                                        transaction_type=WITHDRAW)
-                        if validated_data.get('amount'):
-                            current_balance = update_wallet_balance(validated_data.get('amount'),
-                                                                    WITHDRAW,
-                                                                    wallet_obj.balance)
-                            wallet_obj.balance = current_balance
-                            wallet_obj.save()
+                        wallet_deposit_obj = create_transaction(self.user, SUCCESS,
+                                                                validated_data.get('amount'),
+                                                                validated_data.get('reference_id'),
+                                                                WITHDRAW)
+
                         return wallet_deposit_obj
-                raise serializers.ValidationError \
-                    ({"detail": "Wallet is disabled"})
